@@ -1,0 +1,7 @@
+flask
+langgraph
+langchain-groq
+python-dotenv
+requests
+pydantic
+pillow

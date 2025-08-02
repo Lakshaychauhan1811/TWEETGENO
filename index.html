@@ -1,0 +1,955 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TweetGeno - AI Tweet Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --primary-dark: #111111;
+            --primary-light: #222222;
+            --secondary: #ffffff;
+            --accent: #333333;
+            --success: #000000;
+            --warning: #666666;
+            --error: #888888;
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #999999;
+            --border: #333333;
+            --border-light: #444444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.6);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.7);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+        
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 0 20px;
+        }
+        
+        /* Header */
+        .header {
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(20px);
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            padding: 1.5rem 0;
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        
+        .logo {
+            font-size: 1.8rem;
+            font-weight: 900;
+            color: var(--secondary);
+            text-decoration: none;
+            letter-spacing: 2px;
+            text-transform: uppercase;
+            position: relative;
+        }
+        
+        .logo:after {
+            content: '';
+            position: absolute;
+            bottom: -5px;
+            left: 0;
+            width: 100%;
+            height: 2px;
+            background: linear-gradient(90deg, var(--secondary) 0%, transparent 100%);
+        }
+        
+        .nav-links {
+            display: flex;
+            gap: 3rem;
+            list-style: none;
+        }
+        
+        .nav-links a {
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            padding: 0.5rem 0;
+            letter-spacing: 0.5px;
+        }
+        
+        .nav-links a:after {
+            content: '';
+            position: absolute;
+            width: 0;
+            height: 2px;
+            bottom: 0;
+            left: 0;
+            background-color: var(--secondary);
+            transition: width 0.3s ease;
+        }
+        
+        .nav-links a:hover {
+            color: var(--secondary);
+        }
+        
+        .nav-links a:hover:after {
+            width: 100%;
+        }
+        
+        /* Hero Section */
+        .hero {
+            padding: 8rem 0 6rem;
+            text-align: center;
+            color: white;
+            position: relative;
+            overflow: hidden;
+            background: linear-gradient(135deg, #000000 0%, #111111 50%, #000000 100%);
+        }
+        
+        .hero:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.05) 0%, rgba(0, 0, 0, 0) 50%),
+                        radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.03) 0%, rgba(0, 0, 0, 0) 50%);
+            z-index: 1;
+        }
+        
+        .hero-content {
+            position: relative;
+            z-index: 2;
+        }
+        
+        .hero h1 {
+            font-size: clamp(3rem, 7vw, 5.5rem);
+            font-weight: 900;
+            margin-bottom: 2rem;
+            line-height: 1.1;
+            letter-spacing: -2px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            background: linear-gradient(135deg, #ffffff 0%, #cccccc 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+        
+        .hero p {
+            font-size: 1.4rem;
+            margin-bottom: 3rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+            color: var(--text-secondary);
+            font-weight: 300;
+        }
+        
+        .hero-subtitle {
+            font-size: 1.1rem;
+            color: var(--text-muted);
+            margin-bottom: 3rem;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+        
+        .cta-buttons {
+            display: flex;
+            gap: 2rem;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        .btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1.25rem 3rem;
+            border-radius: 0;
+            font-weight: 600;
+            text-decoration: none;
+            transition: all 0.4s ease;
+            border: none;
+            cursor: pointer;
+            font-size: 1.1rem;
+            letter-spacing: 1px;
+            position: relative;
+            overflow: hidden;
+            text-transform: uppercase;
+        }
+        
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: transform 0.6s ease;
+        }
+        
+        .btn:hover:before {
+            transform: translateX(200%);
+        }
+        
+        .btn-primary {
+            background: var(--secondary);
+            color: var(--primary);
+            box-shadow: var(--shadow-lg);
+            border: 2px solid var(--secondary);
+        }
+        
+        .btn-primary:hover {
+            background: transparent;
+            color: var(--secondary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        .btn-secondary {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            backdrop-filter: blur(10px);
+        }
+        
+        .btn-secondary:hover {
+            background: var(--secondary);
+            color: var(--primary);
+            transform: translateY(-5px);
+            box-shadow: var(--shadow-xl);
+        }
+        
+        /* Problem Section */
+        .problem-section {
+            padding: 6rem 0;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+        
+        .problem-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .section-header {
+            text-align: center;
+            margin-bottom: 5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .section-title {
+            font-size: 3rem;
+            font-weight: 900;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            letter-spacing: -2px;
+            position: relative;
+            display: inline-block;
+        }
+        
+        .section-title:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+        }
+        
+        .section-subtitle {
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            max-width: 800px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+        
+        .problem-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 2.5rem;
+            margin-top: 4rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .problem-card {
+            background: var(--bg-tertiary);
+            padding: 2.5rem;
+            border-radius: 0;
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s ease;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+            text-align: center;
+        }
+        
+        .problem-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--error);
+            transition: height 0.4s ease;
+        }
+        
+        .problem-card:hover {
+            transform: translateY(-10px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--error);
+        }
+        
+        .problem-card:hover:before {
+            height: 100%;
+        }
+        
+        .problem-icon {
+            width: 70px;
+            height: 70px;
+            background: var(--error);
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 1.75rem;
+            color: var(--secondary);
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+            border: 2px solid var(--border);
+        }
+        
+        .problem-card:hover .problem-icon {
+            transform: scale(1.1) rotate(5deg);
+            border-color: var(--error);
+        }
+        
+        .problem-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .problem-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+        
+        /* Features Section */
+        .features {
+            padding: 8rem 0;
+            background: var(--bg-primary);
+            position: relative;
+        }
+        
+        .features:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+            z-index: 0;
+        }
+        
+        .features-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 3rem;
+            margin-top: 5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .feature-card {
+            background: var(--bg-tertiary);
+            padding: 3rem;
+            border-radius: 0;
+            box-shadow: var(--shadow-md);
+            transition: all 0.5s ease;
+            border: 1px solid var(--border);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .feature-card:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 0;
+            background: var(--secondary);
+            transition: height 0.5s ease;
+        }
+        
+        .feature-card:hover {
+            transform: translateY(-15px);
+            box-shadow: var(--shadow-xl);
+            border-color: var(--secondary);
+        }
+        
+        .feature-card:hover:before {
+            height: 100%;
+        }
+        
+        .feature-icon {
+            width: 80px;
+            height: 80px;
+            background: var(--primary);
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-bottom: 2.5rem;
+            font-size: 2rem;
+            color: var(--secondary);
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s ease;
+            border: 2px solid var(--border);
+        }
+        
+        .feature-card:hover .feature-icon {
+            transform: scale(1.1) rotate(5deg);
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .feature-card h3 {
+            font-size: 1.6rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            transition: all 0.4s ease;
+            letter-spacing: -0.5px;
+        }
+        
+        .feature-card:hover h3 {
+            transform: translateX(10px);
+            color: var(--secondary);
+        }
+        
+        .feature-card p {
+            color: var(--text-secondary);
+            line-height: 1.8;
+            transition: all 0.4s ease;
+            font-size: 1.1rem;
+        }
+        
+        .feature-card:hover p {
+            transform: translateX(10px);
+        }
+        
+        /* How It Works Section */
+        .how-it-works {
+            padding: 8rem 0;
+            background: var(--bg-secondary);
+            position: relative;
+        }
+        
+        .steps-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 3rem;
+            margin-top: 5rem;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .step-card {
+            background: var(--bg-tertiary);
+            padding: 2.5rem;
+            border-radius: 0;
+            box-shadow: var(--shadow-md);
+            transition: all 0.4s ease;
+            border: 1px solid var(--border);
+            position: relative;
+            text-align: center;
+        }
+        
+        .step-number {
+            width: 60px;
+            height: 60px;
+            background: var(--secondary);
+            color: var(--primary);
+            border-radius: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 auto 2rem;
+            font-size: 1.5rem;
+            font-weight: 900;
+            box-shadow: var(--shadow-md);
+            transition: all 0.3s ease;
+        }
+        
+        .step-card:hover .step-number {
+            transform: scale(1.1);
+        }
+        
+        .step-card h3 {
+            font-size: 1.4rem;
+            font-weight: 700;
+            margin-bottom: 1rem;
+            color: var(--text-primary);
+        }
+        
+        .step-card p {
+            color: var(--text-secondary);
+            line-height: 1.7;
+            font-size: 1rem;
+        }
+        
+
+        
+        /* CTA Section */
+        .cta-section {
+            padding: 8rem 0;
+            background: linear-gradient(135deg, var(--primary) 0%, var(--primary-dark) 100%);
+            color: white;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .cta-section:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='100' height='100' viewBox='0 0 100 100' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M11 18c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm48 25c3.866 0 7-3.134 7-7s-3.134-7-7-7-7 3.134-7 7 3.134 7 7 7zm-43-7c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm63 31c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM34 90c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zm56-76c1.657 0 3-1.343 3-3s-1.343-3-3-3-3 1.343-3 3 1.343 3 3 3zM12 86c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm28-65c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm23-11c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-6 60c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm29 22c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zM32 63c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm57-13c2.76 0 5-2.24 5-5s-2.24-5-5-5-5 2.24-5 5 2.24 5 5 5zm-9-21c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM60 91c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM35 41c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2zM12 60c1.105 0 2-.895 2-2s-.895-2-2-2-2 .895-2 2 .895 2 2 2z' fill='%23ffffff' fill-opacity='0.03' fill-rule='evenodd'/%3E%3C/svg%3E");
+            opacity: 0.3;
+        }
+        
+        .cta-section h2 {
+            font-size: 4rem;
+            font-weight: 900;
+            margin-bottom: 2rem;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.3);
+            letter-spacing: -2px;
+            position: relative;
+            z-index: 1;
+        }
+        
+        .cta-section p {
+            font-size: 1.5rem;
+            margin-bottom: 4rem;
+            opacity: 0.9;
+            max-width: 800px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+            position: relative;
+            z-index: 1;
+            font-weight: 300;
+        }
+        
+        /* Footer */
+        .footer {
+            background: var(--primary);
+            color: white;
+            padding: 5rem 0 4rem;
+            text-align: center;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .footer:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 1px;
+            background: linear-gradient(to right, transparent, rgba(255,255,255,0.2), transparent);
+        }
+        
+        .footer p {
+            opacity: 0.8;
+            font-size: 1.2rem;
+            letter-spacing: 1px;
+            max-width: 700px;
+            margin: 0 auto;
+            line-height: 1.8;
+            font-weight: 300;
+        }
+        
+        .footer .heart {
+            display: inline-block;
+            color: var(--secondary);
+            animation: heartbeat 1.5s infinite;
+            margin: 0 5px;
+        }
+        
+        @keyframes heartbeat {
+            0%, 100% { transform: scale(1); }
+            50% { transform: scale(1.2); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .nav-links {
+                display: none;
+            }
+            
+            .hero {
+                padding: 6rem 0 4rem;
+            }
+            
+            .cta-buttons {
+                flex-direction: column;
+                align-items: center;
+            }
+            
+            .btn {
+                width: 100%;
+                max-width: 350px;
+                justify-content: center;
+            }
+            
+            .features-grid,
+            .problem-grid,
+            .steps-grid {
+                grid-template-columns: 1fr;
+            }
+            
+            .section-title {
+                font-size: 2.5rem;
+            }
+            
+            .hero h1 {
+                font-size: 3rem;
+            }
+        }
+        
+        /* Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(50px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        .animate-fade-in-up {
+            animation: fadeInUp 0.8s ease-out;
+        }
+        
+        .feature-card,
+        .problem-card,
+        .step-card {
+            animation: fadeInUp 0.8s ease-out;
+            animation-fill-mode: both;
+        }
+        
+        .feature-card:nth-child(1) { animation-delay: 0.1s; }
+        .feature-card:nth-child(2) { animation-delay: 0.2s; }
+        .feature-card:nth-child(3) { animation-delay: 0.3s; }
+        .feature-card:nth-child(4) { animation-delay: 0.4s; }
+        .feature-card:nth-child(5) { animation-delay: 0.5s; }
+        .feature-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        .problem-card:nth-child(1) { animation-delay: 0.1s; }
+        .problem-card:nth-child(2) { animation-delay: 0.2s; }
+        .problem-card:nth-child(3) { animation-delay: 0.3s; }
+        
+        .step-card:nth-child(1) { animation-delay: 0.1s; }
+        .step-card:nth-child(2) { animation-delay: 0.2s; }
+        .step-card:nth-child(3) { animation-delay: 0.3s; }
+        .step-card:nth-child(4) { animation-delay: 0.4s; }
+        
+        /* Floating elements */
+        .floating {
+            animation: float 8s ease-in-out infinite;
+        }
+        
+        @keyframes float {
+            0%, 100% { transform: translateY(0px); }
+            50% { transform: translateY(-30px); }
+        }
+        
+        /* Glow effects */
+        .glow {
+            box-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
+        }
+        
+        .feature-card:hover {
+            box-shadow: 0 0 30px rgba(255, 255, 255, 0.15);
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="container">
+            <nav class="nav">
+                <a href="/" class="logo">TweetGeno</a>
+                <ul class="nav-links">
+                    <li><a href="#problems">Problems</a></li>
+                    <li><a href="#features">Features</a></li>
+                    <li><a href="#how-it-works">How It Works</a></li>
+                    <li><a href="/tweet">Get Started</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <main>
+        <section class="hero">
+            <div class="container">
+                <div class="hero-content">
+                    <h1>Stop Struggling with Tweet Ideas</h1>
+                    <p>Transform your thoughts into viral tweets in seconds. No more staring at a blank screen or wondering what to post. TweetGeno uses advanced AI to create engaging, shareable content that actually gets likes and retweets.</p>
+                    <p class="hero-subtitle">Join thousands of creators who've already boosted their engagement by 300%+</p>
+                    <div class="cta-buttons">
+                        <a href="/tweet" class="btn btn-primary">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                            </svg>
+                            Start Creating Now
+                        </a>
+                        <a href="#how-it-works" class="btn btn-secondary">
+                            <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm1-12a1 1 0 10-2 0v4a1 1 0 00.293.707l2.828 2.829a1 1 0 101.415-1.415L11 9.586V6z" clip-rule="evenodd"/>
+                            </svg>
+                            See How It Works
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="problems" class="problem-section">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Tired of These Tweet Problems?</h2>
+                    <p class="section-subtitle">You're not alone. Most creators struggle with these exact issues every day.</p>
+                </div>
+                
+                <div class="problem-grid">
+                    <div class="problem-card">
+                        <div class="problem-icon">😴</div>
+                        <h3>Writer's Block</h3>
+                        <p>Staring at a blank screen for hours, trying to come up with something clever to post. Sound familiar?</p>
+                    </div>
+                    
+                    <div class="problem-card">
+                        <div class="problem-icon">📉</div>
+                        <h3>Low Engagement</h3>
+                        <p>Your tweets get 2-3 likes while others in your niche are getting hundreds. It's frustrating.</p>
+                    </div>
+                    
+                    <div class="problem-card">
+                        <div class="problem-icon">⏰</div>
+                        <h3>Time Consuming</h3>
+                        <p>Spending 30+ minutes crafting the perfect tweet, only for it to flop. Your time is valuable.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="features" class="features">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">Why Choose TweetGeno?</h2>
+                    <p class="section-subtitle">We solve the problems that keep you from growing your audience and building your brand.</p>
+                </div>
+                
+                <div class="features-grid">
+                    <div class="feature-card">
+                        <div class="feature-icon">🤖</div>
+                        <h3>AI-Powered Generation</h3>
+                        <p>Our advanced AI creates engaging, viral tweets from any topic you provide. No more staring at a blank screen.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">⚡</div>
+                        <h3>Lightning Fast</h3>
+                        <p>Generate multiple tweet variations in seconds. Save hours of brainstorming and writing time.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🎯</div>
+                        <h3>One-Click Publishing</h3>
+                        <p>Connect your X account once and post directly with a single click. No more copy-pasting or manual tweeting.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">📈</div>
+                        <h3>Optimized for Engagement</h3>
+                        <p>Every tweet is crafted using proven viral patterns and humor to maximize likes and retweets.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔄</div>
+                        <h3>Iterative Improvement</h3>
+                        <p>Our AI learns from feedback and continuously refines your tweets to ensure they're perfect before posting.</p>
+                    </div>
+                    
+                    <div class="feature-card">
+                        <div class="feature-icon">🔒</div>
+                        <h3>Secure & Private</h3>
+                        <p>Your data and account information are protected with enterprise-grade security. Your privacy matters.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="how-it-works" class="how-it-works">
+            <div class="container">
+                <div class="section-header">
+                    <h2 class="section-title">How TweetGeno Works</h2>
+                    <p class="section-subtitle">Get from idea to viral tweet in just 3 simple steps</p>
+                </div>
+                
+                <div class="steps-grid">
+                    <div class="step-card">
+                        <div class="step-number">1</div>
+                        <h3>Enter Your Topic</h3>
+                        <p>Simply type what you want to tweet about - anything from "coffee addiction" to "tech trends" or "work from home struggles".</p>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">2</div>
+                        <h3>AI Generates Tweets</h3>
+                        <p>Our AI creates multiple tweet variations, each optimized for maximum engagement and viral potential.</p>
+                    </div>
+                    
+                    <div class="step-card">
+                        <div class="step-number">3</div>
+                        <h3>Post & Grow</h3>
+                        <p>Choose your favorite tweet, connect your X account, and post directly. Watch your engagement skyrocket.</p>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="cta-section">
+            <div class="container">
+                <h2>Ready to Transform Your Twitter Game?</h2>
+                <p>Stop struggling with tweet ideas. Start creating viral content that actually gets engagement and grows your audience.</p>
+                <a href="/tweet" class="btn btn-secondary">
+                    <svg width="20" height="20" fill="currentColor" viewBox="0 0 20 20">
+                        <path d="M10.894 2.553a1 1 0 00-1.788 0l-7 14a1 1 0 001.169 1.409l5-1.429A1 1 0 009 15.571V11a1 1 0 112 0v4.571a1 1 0 00.725.962l5 1.428a1 1 0 001.17-1.408l-7-14z"/>
+                    </svg>
+                    Start Creating Now
+                </a>
+            </div>
+        </section>
+    </main>
+
+    <footer class="footer">
+        <div class="container">
+            <p>&copy; 2024 TweetGeno. All rights reserved. Made with <span class="heart">❤️</span> for creators. Stop struggling with tweet ideas and start growing your audience today.</p>
+        </div>
+    </footer>
+
+    <script>
+        // Smooth scrolling for anchor links
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'start'
+                    });
+                }
+            });
+        });
+
+        // Intersection Observer for animations
+        const observerOptions = {
+            threshold: 0.1,
+            rootMargin: '0px 0px -50px 0px'
+        };
+
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.classList.add('animate-fade-in-up');
+                }
+            });
+        }, observerOptions);
+
+        // Observe all cards
+        document.querySelectorAll('.feature-card, .problem-card, .step-card').forEach(card => {
+            observer.observe(card);
+        });
+
+        // Add floating animation to some elements
+        document.querySelectorAll('.feature-icon').forEach((icon, index) => {
+            if (index % 2 === 0) {
+                icon.classList.add('floating');
+            }
+        });
+
+        // Add glow effect on hover
+        document.querySelectorAll('.feature-card').forEach(card => {
+            card.addEventListener('mouseenter', function() {
+                this.classList.add('glow');
+            });
+            
+            card.addEventListener('mouseleave', function() {
+                this.classList.remove('glow');
+            });
+        });
+    </script>
+</body>
+</html>

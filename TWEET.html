@@ -1,0 +1,1046 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>TweetGeno - Generate Viral Tweet</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #000000;
+            --primary-dark: #111111;
+            --primary-light: #222222;
+            --secondary: #ffffff;
+            --accent: #333333;
+            --success: #000000;
+            --warning: #666666;
+            --error: #888888;
+            --bg-primary: #000000;
+            --bg-secondary: #111111;
+            --bg-tertiary: #1a1a1a;
+            --text-primary: #ffffff;
+            --text-secondary: #cccccc;
+            --text-muted: #999999;
+            --border: #333333;
+            --border-light: #444444;
+            --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+            --shadow: 0 1px 3px 0 rgb(0 0 0 / 0.4), 0 1px 2px -1px rgb(0 0 0 / 0.4);
+            --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.5), 0 2px 4px -2px rgb(0 0 0 / 0.5);
+            --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.6), 0 4px 6px -4px rgb(0 0 0 / 0.6);
+            --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.7), 0 8px 10px -6px rgb(0 0 0 / 0.7);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.6;
+            min-height: 100vh;
+            position: relative;
+        }
+        
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.02'%3E%3Cpath d='M36 34v-4h-2v4h-4v2h4v4h2v-4h4v-2h-4zm0-30V0h-2v4h-4v2h4v4h2V6h4V4h-4zM6 34v-4H4v4H0v2h4v4h2v-4h4v-2H6zM6 4V0H4v4H0v2h4v4h2V6h4V4H6z'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E");
+            opacity: 0.3;
+            z-index: -1;
+        }
+        
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        
+        .back-link {
+            position: fixed;
+            top: 0;
+            left: 2rem;
+            z-index: 10;
+            color: var(--text-secondary);
+            text-decoration: none;
+            font-weight: 500;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            padding: 1rem 0;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .back-link:hover {
+            color: var(--secondary);
+            transform: translateX(-5px);
+        }
+        
+        .back-link svg {
+            width: 20px;
+            height: 20px;
+            transition: transform 0.3s ease;
+        }
+        
+        .back-link:hover svg {
+            transform: translateX(-3px);
+        }
+        
+        .main-title {
+            text-align: center;
+            margin-top: 3rem;
+            margin-bottom: 1rem;
+            font-size: 3.5rem;
+            font-weight: 900;
+            color: var(--secondary);
+            letter-spacing: -2px;
+            text-shadow: 0 4px 20px rgba(0, 0, 0, 0.5);
+            position: relative;
+        }
+        
+        .main-title:after {
+            content: '';
+            position: absolute;
+            bottom: -15px;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 100px;
+            height: 4px;
+            background: var(--secondary);
+        }
+        
+        .subtitle {
+            text-align: center;
+            margin-bottom: 4rem;
+            font-size: 1.3rem;
+            color: var(--text-secondary);
+            font-weight: 300;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            line-height: 1.8;
+        }
+        
+        .auth-section {
+            background: var(--bg-tertiary);
+            padding: 2rem;
+            border-radius: 0;
+            margin-bottom: 3rem;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            text-align: center;
+        }
+        
+        .auth-btn {
+            background: var(--secondary);
+            color: var(--primary);
+            border: none;
+            padding: 1rem 2rem;
+            border-radius: 0;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.75rem;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .auth-btn:hover {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .auth-btn svg {
+            width: 20px;
+            height: 20px;
+        }
+        
+        .generator-section {
+            background: var(--bg-tertiary);
+            padding: 3rem;
+            border-radius: 0;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            margin-bottom: 3rem;
+        }
+        
+        .input-group {
+            margin-bottom: 2rem;
+        }
+        
+        .input-group label {
+            display: block;
+            margin-bottom: 0.75rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            letter-spacing: 0.5px;
+        }
+        
+        .topic-input {
+            width: 100%;
+            padding: 1.25rem;
+            border: 2px solid var(--border);
+            border-radius: 0;
+            background: var(--bg-secondary);
+            color: var(--text-primary);
+            font-size: 1.1rem;
+            font-family: inherit;
+            transition: all 0.3s ease;
+            box-shadow: var(--shadow-sm);
+        }
+        
+        .topic-input:focus {
+            outline: none;
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-md);
+            background: var(--bg-primary);
+        }
+        
+        .topic-input::placeholder {
+            color: var(--text-muted);
+        }
+        
+        /* Image Upload Section */
+        .image-upload-section {
+            margin-bottom: 2.5rem;
+            position: relative;
+        }
+        
+        .image-upload-area {
+            border: 2px dashed var(--border);
+            border-radius: 0;
+            padding: 3rem 2rem;
+            text-align: center;
+            background: var(--bg-secondary);
+            transition: all 0.4s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .image-upload-area:hover {
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.02);
+            transform: translateY(-3px);
+        }
+        
+        .image-upload-area.dragover {
+            border-color: var(--secondary);
+            background: rgba(255, 255, 255, 0.05);
+        }
+        
+        .upload-icon {
+            font-size: 3rem;
+            color: var(--text-muted);
+            margin-bottom: 1rem;
+            transition: all 0.3s ease;
+        }
+        
+        .image-upload-area:hover .upload-icon {
+            color: var(--secondary);
+            transform: scale(1.1);
+        }
+        
+        .upload-text {
+            color: var(--text-secondary);
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+            font-weight: 500;
+        }
+        
+        .upload-subtext {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .file-input {
+            position: absolute;
+            opacity: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .image-preview {
+            display: none;
+            margin-top: 2rem;
+            text-align: center;
+        }
+        
+        .image-preview img {
+            max-width: 100%;
+            max-height: 300px;
+            border-radius: 0;
+            border: 2px solid var(--border);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .image-preview .remove-image {
+            margin-top: 1rem;
+            padding: 0.75rem 1.5rem;
+            background: var(--error);
+            color: var(--secondary);
+            border: none;
+            border-radius: 0;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-image:hover {
+            background: transparent;
+            color: var(--error);
+            border: 2px solid var(--error);
+        }
+        
+        .generation-tabs {
+            display: flex;
+            gap: 1rem;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid var(--border);
+        }
+        
+        .tab-button {
+            padding: 1rem 2rem;
+            background: transparent;
+            border: none;
+            color: var(--text-secondary);
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            border-bottom: 3px solid transparent;
+            letter-spacing: 0.5px;
+        }
+        
+        .tab-button.active {
+            color: var(--secondary);
+            border-bottom-color: var(--secondary);
+        }
+        
+        .tab-button:hover {
+            color: var(--secondary);
+        }
+        
+        .tab-content {
+            display: none;
+        }
+        
+        .tab-content.active {
+            display: block;
+        }
+        
+        .btn {
+            background: var(--secondary);
+            color: var(--primary);
+            border: none;
+            padding: 1.25rem 3rem;
+            border-radius: 0;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 1.1rem;
+            transition: all 0.3s ease;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            box-shadow: var(--shadow-md);
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .btn:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(0, 0, 0, 0.2), transparent);
+            transition: transform 0.6s ease;
+        }
+        
+        .btn:hover:before {
+            transform: translateX(200%);
+        }
+        
+        .btn:hover {
+            background: transparent;
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-lg);
+        }
+        
+        .btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .btn:disabled:hover {
+            background: var(--secondary);
+            color: var(--primary);
+            border: none;
+            transform: none;
+            box-shadow: var(--shadow-md);
+        }
+        
+        .tweet-display {
+            background: var(--bg-secondary);
+            padding: 2rem;
+            border-radius: 0;
+            border: 1px solid var(--border);
+            margin-top: 2rem;
+            box-shadow: var(--shadow-md);
+            display: none;
+        }
+        
+        .tweet-header {
+            display: flex;
+            align-items: center;
+            margin-bottom: 1.5rem;
+            gap: 1rem;
+        }
+        
+        .tweet-avatar {
+            width: 50px;
+            height: 50px;
+            background: var(--secondary);
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            color: var(--primary);
+            font-size: 1.2rem;
+        }
+        
+        .tweet-user-info {
+            flex: 1;
+        }
+        
+        .tweet-user {
+            font-weight: 700;
+            color: var(--text-primary);
+            font-size: 1.1rem;
+        }
+        
+        .tweet-handle {
+            color: var(--text-muted);
+            font-size: 0.9rem;
+        }
+        
+        .tweet-content {
+            font-size: 1.2rem;
+            line-height: 1.6;
+            color: var(--text-primary);
+            margin-bottom: 1.5rem;
+            white-space: pre-wrap;
+        }
+        
+        .tweet-actions {
+            display: flex;
+            gap: 1rem;
+            flex-wrap: wrap;
+        }
+        
+        .tweet-btn {
+            background: var(--primary);
+            color: var(--secondary);
+            border: 2px solid var(--secondary);
+            padding: 0.75rem 1.5rem;
+            border-radius: 0;
+            font-weight: 600;
+            cursor: pointer;
+            font-size: 0.9rem;
+            transition: all 0.3s ease;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+        
+        .tweet-btn:hover {
+            background: var(--secondary);
+            color: var(--primary);
+            transform: translateY(-2px);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .tweet-btn:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+            transform: none;
+        }
+        
+        .history-section {
+            background: var(--bg-tertiary);
+            padding: 2rem;
+            border-radius: 0;
+            border: 1px solid var(--border);
+            box-shadow: var(--shadow-md);
+            margin-top: 2rem;
+            display: none;
+        }
+        
+        .history-title {
+            font-size: 1.3rem;
+            font-weight: 700;
+            margin-bottom: 1.5rem;
+            color: var(--text-primary);
+            letter-spacing: 0.5px;
+        }
+        
+        .history-item {
+            background: var(--bg-secondary);
+            padding: 1.5rem;
+            border-radius: 0;
+            margin-bottom: 1rem;
+            border: 1px solid var(--border-light);
+            transition: all 0.3s ease;
+        }
+        
+        .history-item:hover {
+            border-color: var(--secondary);
+            box-shadow: var(--shadow-md);
+        }
+        
+        .feedback-text {
+            color: var(--text-secondary);
+            font-style: italic;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border-light);
+            font-size: 0.9rem;
+        }
+        
+        .message {
+            padding: 1rem;
+            border-radius: 0;
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+        
+        .message.error {
+            background: rgba(255, 0, 0, 0.1);
+            border: 1px solid rgba(255, 0, 0, 0.3);
+            color: #ff6b6b;
+        }
+        
+        .message.success {
+            background: rgba(0, 255, 0, 0.1);
+            border: 1px solid rgba(0, 255, 0, 0.3);
+            color: #51cf66;
+        }
+        
+        .loading-spinner {
+            display: inline-block;
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top-color: var(--secondary);
+            animation: spin 1s ease-in-out infinite;
+            margin-right: 0.5rem;
+        }
+        
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+        
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            
+            .main-title {
+                font-size: 2.5rem;
+                margin-top: 2rem;
+            }
+            
+            .subtitle {
+                font-size: 1.1rem;
+            }
+            
+            .generator-section {
+                padding: 2rem;
+            }
+            
+            .back-link {
+                left: 1rem;
+                font-size: 1rem;
+            }
+            
+            .tweet-actions {
+                flex-direction: column;
+            }
+            
+            .tweet-btn {
+                width: 100%;
+                text-align: center;
+            }
+            
+            .generation-tabs {
+                flex-direction: column;
+                gap: 0.5rem;
+            }
+            
+            .tab-button {
+                padding: 0.75rem 1rem;
+                font-size: 0.9rem;
+            }
+            
+            .image-upload-area {
+                padding: 2rem 1rem;
+            }
+            
+            .upload-icon {
+                font-size: 2.5rem;
+            }
+            
+            .upload-text {
+                font-size: 1rem;
+            }
+            
+            .upload-subtext {
+                font-size: 0.8rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <a href="/" class="back-link">
+        <svg fill="currentColor" viewBox="0 0 20 20">
+            <path fill-rule="evenodd" d="M9.707 16.707a1 1 0 01-1.414 0l-6-6a1 1 0 010-1.414l6-6a1 1 0 011.414 1.414L5.414 9H17a1 1 0 110 2H5.414l4.293 4.293a1 1 0 010 1.414z" clip-rule="evenodd"/>
+        </svg>
+        Back to Home
+    </a>
+
+    <div class="container">
+        <h1 class="main-title">TweetGeno</h1>
+        <p class="subtitle">Generate viral tweets with AI. Enter any topic and watch the magic happen.</p>
+
+        <div class="auth-section" id="authSection">
+            <h3>Connect Your X Account</h3>
+            <p>Post tweets directly to your X account with one click</p>
+            <a href="/login" class="auth-btn" id="loginBtn">
+                <svg fill="currentColor" viewBox="0 0 20 20">
+                    <path d="M6.29 18.251c7.547 0 11.675-6.253 11.675-11.675 0-.178 0-.355-.012-.53A8.348 8.348 0 0020 3.92a8.19 8.19 0 01-2.357.646 4.118 4.118 0 001.804-2.27 8.224 8.224 0 01-2.605.996 4.107 4.107 0 00-6.993 3.743 11.65 11.65 0 01-8.457-4.287 4.106 4.106 0 001.27 5.477A4.073 4.073 0 01.8 7.713v.052a4.105 4.105 0 003.292 4.022 4.095 4.095 0 01-1.853.07 4.108 4.108 0 003.834 2.85A8.233 8.233 0 010 16.407a11.616 11.616 0 006.29 1.84"/>
+                </svg>
+                Connect X Account
+            </a>
+        </div>
+
+        <div class="generator-section">
+            <div class="generation-tabs">
+                <button class="tab-button active" data-tab="text-tab">📝 Text-Based</button>
+                <button class="tab-button" data-tab="image-tab">🖼️ Image-Based</button>
+            </div>
+            
+            <!-- Text-based generation tab -->
+            <div id="text-tab" class="tab-content active">
+                <div class="input-group">
+                    <label for="topicInput">What do you want to tweet about?</label>
+                    <input type="text" id="topicInput" class="topic-input" placeholder="e.g., coffee addiction, tech trends, work from home struggles..." maxlength="200">
+                </div>
+                <button id="generateBtn" class="btn">Generate Tweet</button>
+            </div>
+            
+            <!-- Image-based generation tab -->
+            <div id="image-tab" class="tab-content">
+                <div class="image-upload-section">
+                                            <div class="image-upload-area" id="uploadArea">
+                            <div class="upload-icon">📷</div>
+                            <div class="upload-text">Upload an image to generate a contextual tweet</div>
+                            <div class="upload-subtext">Drag & drop or click to browse (JPG, PNG, GIF up to 10MB)<br><small>💡 Tip: AI will analyze people, objects, text, and actions in your image</small></div>
+                            <input type="file" id="imageInput" class="file-input" accept="image/*">
+                        </div>
+                    
+                    <div class="image-preview" id="imagePreview">
+                        <img id="previewImage" src="" alt="Preview">
+                        <button class="remove-image" id="removeImage">Remove Image</button>
+                    </div>
+                </div>
+                
+                <button id="generateImageBtn" class="btn" style="display: none;">Generate Tweet from Image</button>
+            </div>
+        </div>
+
+        <div class="tweet-display" id="tweetDisplay">
+            <div class="tweet-header">
+                <div class="tweet-avatar">T</div>
+                <div class="tweet-user-info">
+                    <div class="tweet-user">TweetGeno</div>
+                    <div class="tweet-handle">@tweetgeno</div>
+                </div>
+            </div>
+            <div class="tweet-content" id="tweetContent"></div>
+            <div class="tweet-actions">
+                <button class="tweet-btn" id="postBtn">Post to X</button>
+                <button class="tweet-btn" id="regenerateBtn">Regenerate</button>
+                <button class="tweet-btn" id="copyBtn">Copy Tweet</button>
+            </div>
+        </div>
+
+        <div class="history-section" id="historySection">
+            <h3 class="history-title">Generation History</h3>
+            <div id="historyList"></div>
+        </div>
+    </div>
+
+    <script>
+        const topicInput = document.getElementById('topicInput');
+        const generateBtn = document.getElementById('generateBtn');
+        const tweetDisplay = document.getElementById('tweetDisplay');
+        const tweetContent = document.getElementById('tweetContent');
+        const postBtn = document.getElementById('postBtn');
+        const regenerateBtn = document.getElementById('regenerateBtn');
+        const copyBtn = document.getElementById('copyBtn');
+        const historySection = document.getElementById('historySection');
+        const historyList = document.getElementById('historyList');
+        const authSection = document.getElementById('authSection');
+        const loginBtn = document.getElementById('loginBtn');
+        const imageInput = document.getElementById('imageInput');
+        const uploadArea = document.getElementById('uploadArea');
+        const imagePreview = document.getElementById('imagePreview');
+        const previewImage = document.getElementById('previewImage');
+        const removeImageBtn = document.getElementById('removeImage');
+        const generateImageBtn = document.getElementById('generateImageBtn');
+
+        let currentTweet = '';
+        let tweetHistory = [];
+
+        // Check authentication status
+        async function checkAuth() {
+            try {
+                const response = await fetch('/check-auth');
+                const data = await response.json();
+                
+                if (data.authenticated) {
+                    authSection.innerHTML = `
+                        <h3>✅ Connected to X</h3>
+                        <p>You can now post tweets directly to your account</p>
+                        <button class="auth-btn" onclick="logout()">
+                            <svg fill="currentColor" viewBox="0 0 20 20">
+                                <path fill-rule="evenodd" d="M3 3a1 1 0 00-1 1v12a1 1 0 102 0V4a1 1 0 00-1-1zm10.293 9.293a1 1 0 001.414 1.414l3-3a1 1 0 000-1.414l-3-3a1 1 0 10-1.414 1.414L14.586 9H7a1 1 0 100 2h7.586l-1.293 1.293z" clip-rule="evenodd"/>
+                            </svg>
+                            Disconnect
+                        </button>
+                    `;
+                }
+            } catch (error) {
+                console.error('Error checking auth:', error);
+            }
+        }
+
+        function logout() {
+            window.location.href = '/logout';
+        }
+
+        function setLoadingState(loading) {
+            if (loading) {
+                generateBtn.innerHTML = '<span class="loading-spinner"></span>Generating...';
+                generateBtn.disabled = true;
+            } else {
+                generateBtn.innerHTML = 'Generate Tweet';
+                generateBtn.disabled = false;
+            }
+        }
+
+        function showMessage(message, type = 'error') {
+            const messageDiv = document.createElement('div');
+            messageDiv.className = `message ${type}`;
+            messageDiv.textContent = message;
+            
+            const container = document.querySelector('.container');
+            container.insertBefore(messageDiv, container.firstChild);
+            
+            setTimeout(() => {
+                messageDiv.remove();
+            }, 5000);
+        }
+
+        async function generateTweet() {
+            const topic = topicInput.value.trim();
+            
+            if (!topic) {
+                showMessage('Please enter a topic for your tweet');
+                return;
+            }
+
+            setLoadingState(true);
+
+            try {
+                const response = await fetch('/generate-tweet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ topic })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentTweet = data.tweet;
+                    tweetContent.textContent = currentTweet;
+                    tweetDisplay.style.display = 'block';
+                    
+                    // Add to history
+                    tweetHistory.unshift({
+                        tweet: data.tweet,
+                        feedback: data.feedback || '',
+                        timestamp: new Date().toLocaleTimeString()
+                    });
+                    
+                    updateHistory();
+                    historySection.style.display = 'block';
+                    
+                    showMessage('Tweet generated successfully!', 'success');
+                } else {
+                    showMessage(data.error || 'Failed to generate tweet');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to generate tweet. Please try again.');
+            } finally {
+                setLoadingState(false);
+            }
+        }
+
+        async function postTweet() {
+            if (!currentTweet) return;
+
+            postBtn.innerHTML = '<span class="loading-spinner"></span>Posting...';
+            postBtn.disabled = true;
+
+            try {
+                const response = await fetch('/post-tweet', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({ tweet: currentTweet })
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    showMessage('Tweet posted successfully!', 'success');
+                    postBtn.innerHTML = 'Posted ✓';
+                    setTimeout(() => {
+                        postBtn.innerHTML = 'Post to X';
+                    }, 3000);
+                } else {
+                    showMessage(data.error || 'Failed to post tweet');
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to post tweet. Please try again.');
+            } finally {
+                postBtn.disabled = false;
+            }
+        }
+
+        function copyTweet() {
+            if (!currentTweet) return;
+            
+            navigator.clipboard.writeText(currentTweet).then(() => {
+                copyBtn.innerHTML = 'Copied ✓';
+                setTimeout(() => {
+                    copyBtn.innerHTML = 'Copy Tweet';
+                }, 2000);
+                showMessage('Tweet copied to clipboard!', 'success');
+            }).catch(() => {
+                showMessage('Failed to copy tweet');
+            });
+        }
+
+        function regenerateTweet() {
+            // Check which tab is active
+            const activeTab = document.querySelector('.tab-button.active');
+            if (activeTab && activeTab.dataset.tab === 'image-tab') {
+                // Regenerate from image
+                if (imageInput.files && imageInput.files[0]) {
+                    generateImageBtn.click();
+                } else {
+                    showMessage('Please upload an image first!');
+                }
+            } else {
+                // Regenerate from text
+                if (topicInput.value.trim()) {
+                    generateTweet();
+                }
+            }
+        }
+
+        function updateHistory() {
+            historyList.innerHTML = '';
+            
+            tweetHistory.slice(0, 5).forEach((item, index) => {
+                const historyItem = document.createElement('div');
+                historyItem.className = 'history-item';
+                historyItem.innerHTML = `
+                    <div><strong>${item.tweet}</strong></div>
+                    ${item.feedback ? `<div class="feedback-text">${item.feedback}</div>` : ''}
+                    <small style="color: var(--text-muted);">${item.timestamp}</small>
+                `;
+                historyList.appendChild(historyItem);
+            });
+        }
+
+        // Event listeners
+        generateBtn.addEventListener('click', generateTweet);
+        postBtn.addEventListener('click', postTweet);
+        copyBtn.addEventListener('click', copyTweet);
+        regenerateBtn.addEventListener('click', regenerateTweet);
+
+        topicInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                generateTweet();
+            }
+        });
+
+        // Tab switching logic
+        document.addEventListener('DOMContentLoaded', function() {
+            const tabButtons = document.querySelectorAll('.tab-button');
+            const tabContents = document.querySelectorAll('.tab-content');
+
+            tabButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const targetTab = this.dataset.tab;
+                    tabButtons.forEach(btn => btn.classList.remove('active'));
+                    tabContents.forEach(content => content.classList.remove('active'));
+                    this.classList.add('active');
+                    document.getElementById(targetTab).classList.add('active');
+                });
+            });
+
+            // Image upload functionality
+            uploadArea.addEventListener('dragover', function(e) {
+                e.preventDefault();
+                uploadArea.classList.add('dragover');
+            });
+            uploadArea.addEventListener('dragleave', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+            });
+            uploadArea.addEventListener('drop', function(e) {
+                e.preventDefault();
+                uploadArea.classList.remove('dragover');
+                const file = e.dataTransfer.files[0];
+                if (file) {
+                    previewImage.src = URL.createObjectURL(file);
+                    imagePreview.style.display = 'block';
+                    generateImageBtn.style.display = 'inline-flex';
+                }
+            });
+            uploadArea.addEventListener('click', function() {
+                imageInput.click();
+            });
+            imageInput.addEventListener('change', function() {
+                if (this.files && this.files[0]) {
+                    previewImage.src = URL.createObjectURL(this.files[0]);
+                    imagePreview.style.display = 'block';
+                    generateImageBtn.style.display = 'inline-flex';
+                }
+            });
+            removeImageBtn.addEventListener('click', function() {
+                previewImage.src = '';
+                imagePreview.style.display = 'none';
+                generateImageBtn.style.display = 'none';
+            });
+        });
+
+        // Image-based tweet generation
+        generateImageBtn.addEventListener('click', async function() {
+            const imageFile = imageInput.files[0];
+            if (!imageFile) {
+                showMessage('Please upload an image first!');
+                return;
+            }
+            
+            // Check file size before uploading
+            const maxSize = 10 * 1024 * 1024; // 10MB
+            if (imageFile.size > maxSize) {
+                showMessage('Image file is too large. Please use an image smaller than 10MB.');
+                return;
+            }
+            
+            setLoadingState(true);
+            generateImageBtn.innerHTML = '<span class="loading-spinner"></span>Analyzing Image Details...';
+            generateImageBtn.disabled = true;
+
+            try {
+                const formData = new FormData();
+                formData.append('image', imageFile);
+                
+                const response = await fetch('/generate-tweet-from-image', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (response.ok) {
+                    currentTweet = data.tweet;
+                    tweetContent.textContent = currentTweet;
+                    tweetDisplay.style.display = 'block';
+                    
+                    // Add to history
+                    tweetHistory.unshift({
+                        tweet: data.tweet,
+                        feedback: data.feedback || '',
+                        timestamp: new Date().toLocaleTimeString()
+                    });
+                    
+                    updateHistory();
+                    historySection.style.display = 'block';
+                    
+                    if (data.feedback && data.feedback.includes('general tweet')) {
+                        showMessage('Generated a general tweet about photo sharing since the image was too large for detailed analysis. Try with a smaller image for better results.', 'info');
+                    } else {
+                        showMessage('Tweet generated from detailed image analysis successfully!', 'success');
+                    }
+                } else {
+                    let errorMessage = data.error || 'Failed to generate tweet from image';
+                    
+                    // Provide helpful guidance based on error type
+                    if (errorMessage.includes('too large') || errorMessage.includes('smaller')) {
+                        errorMessage += ' 💡 Tip: Try using a smaller image (under 1MB) or a simpler photo.';
+                    } else if (errorMessage.includes('Invalid file type')) {
+                        errorMessage += ' 💡 Tip: Please use JPG, PNG, or GIF files only.';
+                    }
+                    
+                    showMessage(errorMessage);
+                }
+            } catch (error) {
+                console.error('Error:', error);
+                showMessage('Failed to generate tweet from image. Please try again with a smaller image.');
+            } finally {
+                setLoadingState(false);
+                generateImageBtn.innerHTML = 'Generate Tweet from Image';
+                generateImageBtn.disabled = false;
+            }
+        });
+
+        // Check auth on page load
+        checkAuth();
+    </script>
+</body>
+</html>
